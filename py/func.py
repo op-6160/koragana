@@ -1,16 +1,30 @@
 from jamo import h2j, j2hcj
 from hangul_utils import join_jamos
-import data
+import data as d
 
 is_not_test = True
 
 
 def get_item():
     get_string = input("input:")
-    if get_string == 'e':
+    if get_string == 'e' or get_string == 'ㄷ':
         exit()
     ###print(get_string) #input 검증
     return get_string
+
+
+def distjamo(dist_list):
+    disted = list(j2hcj(h2j(dist_list)))
+    return disted
+
+
+def joinjamo(join_list):
+    joined = list(join_jamos(join_list))
+    return joined
+
+
+def rs(reversesort):
+    return reversesort.sort(reverse=True)
 
 
 class Translation:
@@ -18,19 +32,20 @@ class Translation:
         # dataload
         self.val = input_string
         #self.cnt = 0
-        self.kor = data.kor
-        self.jap = data.jap
-        self.jak = data.jak
-        self.ja = data.jaeum
-        self.ja_ex = data.jaeum_ex
-        self.mo = data.moeum
-        self.yo = data.jap_yo
-        self.yk = data.jap_yk
-        self.wow1 = data.wow1
-        self.wow2 = data.wow2
+        self.kor = d.kor
+        self.jap = d.jap
+        self.jak = d.jak
+        self.ja = d.jaeum
+        self.ja_ex = d.jaeum_ex
+        self.mo = d.moeum
+        self.yo = d.jap_yo
+        self.yk = d.jap_yk
+        self.wow1 = d.wow1
+        self.wow2 = d.wow2
 
         self.x = self.anl(self.val)
         #print('end anl',self.x)
+        self.x = self.anl_3(self.x)
         self.x = self.zz(self.x)
         #print('end zz', self.x)
         self.x = self.trans(self.x)
@@ -42,7 +57,7 @@ class Translation:
 
     # 요음(ㅑㅠㅛ) 처리
     def dis(self, dis_input):
-        dis_list_ = list(j2hcj(h2j(dis_input)))
+        dis_list_ = distjamo(dis_input)
         ja_list = self.ja
         yo_list = self.yo
         for j_idx, j_val in enumerate(dis_list_):
@@ -61,11 +76,11 @@ class Translation:
 
     # 받침 처리
     def syll(self, syll_input):
-        syll_list = list(j2hcj(h2j(syll_input)))
+        syll_list = distjamo(syll_input)
         mo_list = self.mo
         ja_list = self.ja_ex
-        batchim = data.batchim_h # if () else data.batchim_g
-        spe_syll_list = list(data.is_im_sads)
+        batchim = d.batchim_h # if () else d.batchim_g
+        spe_syll_list = list(d.is_im_sads)
         temp_idx_list=[]
         temp_syll_list=[]
         temp_idx = 0
@@ -78,9 +93,9 @@ class Translation:
 
             if sy_idx<int(len(syll_list)-1) and syll_list[sy_idx - 1] in mo_list and sy_idx != 0 and syll_list[sy_idx+1] not in mo_list\
                     or sy_idx == int(len(syll_list)-1) and syll_list[sy_idx - 1] in mo_list:
-                if sy_val in data.baatn:
+                if sy_val in d.baatn:
                     syll_list[sy_idx] = batchim[0] # ん
-                elif sy_val in data.baats:
+                elif sy_val in d.baats:
                     syll_list[sy_idx] = batchim[1] # っ
                 elif sy_val in 'ㅁ':
                     syll_list[sy_idx] = batchim[2] # む
@@ -108,7 +123,7 @@ class Translation:
     # 특수문자(요음,받침) 처리
     def special(self, special_input):
         value = self.syll(special_input)
-        value = join_jamos(value)
+        value = joinjamo(value)
         ###print('join_jamos',value)
         value = self.trans(value)
         value = self.dis(value)
@@ -144,9 +159,44 @@ class Translation:
             out[idx] = 'ㅏ'
             del out[idx + 1]
 
+    #자음처리
+    def anl_3(self, anl_in):
+        ilist = distjamo(anl_in)
+        tempidx = []
+        for lidx, lval in enumerate(ilist):
+            if lval in d.sajs :#and lidx < int(len(ilist))-1:
+                if lidx == int(len(ilist))-1 or ilist[lidx+1] in self.mo:
+                    if   lval in d.saj_1: ilist[lidx] = 'ㅅ'
+                    elif lval in d.saj_2: ilist[lidx] = 'ㅍ'
+                    elif lval in d.saj_3: ilist[lidx] = 'ㅊ'
+                    elif lval in d.saj_4: ilist[lidx] = 'ㅋ'
+                # 쌍받침 처리 일단 쌍시옷만
+                # 뒤 자음이 ㅇ인 받침 ㅆ은 종성ㅅ이랑 초성ㅅ으로 분리 근데 개복잡하네 진짜
+                if lidx != int(len(ilist)) - 1 and lval == d.saj_1 and ilist[lidx-1] in self.mo and ilist[lidx+1] == 'ㅇ':
+                    tempidx.append(lidx)
+                if ilist[lidx-1] in self.mo and lval == d.saj_1:
+                    ilist[lidx] = 'ㅅ'
+            elif lidx == int(len(ilist))-1:
+                if   lval in d.saj_1: ilist[lidx] = 'ㅅ'
+                elif lval in d.saj_2: ilist[lidx] = 'ㅍ'
+                elif lval in d.saj_3: ilist[lidx] = 'ㅊ'
+                elif lval in d.saj_4: ilist[lidx] = 'ㅋ'
+        if tempidx:
+            if len(tempidx) > 1:
+                rs(tempidx)
+                print(tempidx)
+            for idd, iv in enumerate(tempidx):
+                ilist[iv] = 'ㅅ'
+                tempidx[idd] += 1
+        if tempidx :
+            for idd in tempidx:
+                ilist.insert(idd,'ㅅ')
+        out_anl_3 = joinjamo(ilist)
+        return out_anl_3
+        self.sam()
 
-    def anl_3(self):
-        sam()
+    def ssang(self,tempidx, ):
+        pass
 
     # 일반문자 번역
     def trans(self, trans_input):
@@ -210,7 +260,7 @@ class Translation:
 # 오지랖
 def old_word(oooo):
     new_output = oooo
-    old = list(data.old_)
+    old = list(d.old_)
     outoldlist = []
     for o in oooo:
         if o in old:
@@ -230,8 +280,8 @@ def old_word(oooo):
 
 def old_process(in_old_list):
     ols = list(in_old_list)
-    old = list(data.old_)
-    new = list(data.new_)
+    old = list(d.old_)
+    new = list(d.new_)
     for oi, ov in enumerate(ols):
         for i, v in enumerate(old):
             if ov == v:
