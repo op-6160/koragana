@@ -196,6 +196,7 @@ class Translation:
         self.sam()
 
     def ssang(self,tempidx, ):
+        
         pass
 
     # 일반문자 번역
