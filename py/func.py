@@ -4,8 +4,9 @@ import data as d
 
 is_not_test = True
 
-exitcode = ['e', 'ㄷ', 'e ', ' e', 'ㄷ ', ' ㄷ']
+
 def get_item():
+    exitcode = ['e', 'ㄷ', 'e ', ' e', 'ㄷ ', ' ㄷ']
     get_string = input("input:")
     if get_string in exitcode:
         exit()
@@ -292,23 +293,26 @@ class Translation:
 
 # 오지랖
 def old_word(oooo):
+    is_p = False
     new_output = oooo
     old = list(d.old_)
     outoldlist = []
     for o in oooo:
         if o in old:
             for i, v in enumerate(old):
-                if v in old:
+                if o in old:
                     outoldlist.append(v)
                     del old[i]
-                    break
+
+    print('result:', oooo)
     if outoldlist:
-        print('result:', oooo)
         print(' '.join(outoldlist), '는 현재 잘 쓰이지 않는 문자입니다')
         is_op = input("자주 사용되는 문자로 변환 할까요? y or ㅇ :")
-        if is_op in ['Y', 'y', 'ㅇ']:
+        op_ = ['y', 'ㅇ', 'Y', 'y ', 'ㅇ ', 'Y ',' y', ' ㅇ', ' Y',' y ', ' ㅇ ', ' Y ']
+        if is_op in op_:
+            is_p = True
             new_output = old_process(oooo)
-    return new_output
+    return new_output, is_p
 
 
 def old_process(in_old_list):
@@ -325,11 +329,13 @@ def old_process(in_old_list):
 
 def main_process():
     input_ = get_item()
+    is_p = True
     #print('input :', input_)
     translation = Translation(input_)
     output = translation.x
-    output = old_word(output)
-    print('result:', output)
+    output, is_p = old_word(output)
+    if is_p:
+        print('result:', output)
     if is_not_test: # 컴파일시 비활성화
         main_process()
 
