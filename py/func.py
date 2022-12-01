@@ -7,7 +7,7 @@ is_not_test = True
 
 def get_item():
     get_string = input("input:")
-    if get_string == 'e' or get_string == 'ㄷ':
+    if get_string == 'e' or get_string == 'ㄷ' or get_string == ' e' or get_string == ' ㄷ':
         exit()
     ###print(get_string) #input 검증
     return get_string
@@ -46,9 +46,10 @@ class Translation:
         self.x = self.anl(self.val)
         #print('end anl',self.x)
         self.x = self.anl_3(self.x)
-        self.x = self.zz(self.x)
+        #self.x = self.zz(self.x)
         #print('end zz', self.x)
         self.x = self.trans(self.x)
+        self.x = self.zz(self.x)
         #print('end trans', self.x)
         self.x = self.special(self.x)
         #print('end special', self.x)
@@ -102,8 +103,8 @@ class Translation:
                 elif sy_val in 'ㄹ':
                     syll_list[sy_idx] = batchim[3] # る
                 elif sy_val in spe_syll_list:
-
-                    syll_list[sy_idx], temp_idx, temp_syll = spesyll(sy_val)
+                    pass
+                    syll_list[sy_idx], temp_idx, temp_syll = self.spesyll(sy_val)
                     temp_idx_list.append(temp_idx)
                     temp_syll_list.append(temp_syll_list)
         if temp_syll_list:
@@ -117,6 +118,8 @@ class Translation:
 
     def spesyll(self, spsin):
         ins = spsin
+        ses = ins
+        sesidx = 1
         return ins, ses, sesidx
 
     ### 받침을 먼저 처리하도록 해야됨 ###
@@ -162,6 +165,7 @@ class Translation:
     #자음처리
     def anl_3(self, anl_in):
         ilist = distjamo(anl_in)
+        ilist = self.sam(ilist)
         tempidx = []
         for lidx, lval in enumerate(ilist):
             if lval in d.sajs :#and lidx < int(len(ilist))-1:
@@ -191,9 +195,52 @@ class Translation:
         if tempidx :
             for idd in tempidx:
                 ilist.insert(idd,'ㅅ')
+        #ilist = self.sam(ilist)
         out_anl_3 = joinjamo(ilist)
         return out_anl_3
-        self.sam()
+
+    # 이음동의어 ex) ㅊ ㅉ 씨=시=쉬 ㅓ=ㅗ ㅡ=ㅜ 이딴거 받침 제외하고 처리해야 될 듯
+    def sam(self, ilist):
+        tempval = []
+        tempidx = []
+        for ili, ilv in enumerate(ilist):
+            ###print('test', ilv, ilist[ili - 1])
+            if ilv in d.sams:
+                if ilv in d.sam_1: ilist[ili] = 'ㅗ'
+                elif ilv in d.sam_2: ilist[ili] = 'ㅛ'
+                elif ilv in d.sam_3: ilist[ili] = 'ㅔ'
+                #elif ilv in d.sam_4: ilist[ili] = 'ㅣ'
+                elif ilv in d.sam_5: ilist[ili] = 'ㅡ'
+            elif ilv in d.is_fu:
+                if ilv in d.fu_1: #ㅗㅔ 'ㅙ', 'ㅚ'
+                    ilist[ili] = 'ㅗ'
+                    tempidx.append(ili)
+                    tempval.append(d.fu_hina[3])
+                elif ilv in d.fu_2:#ㅜㅔ 'ㅞ'
+                    ilist[ili] = 'ㅡ'
+                    tempidx.append(ili)
+                    tempval.append(d.fu_hina[3])
+                elif ilv in d.fu_3:#ㅜㅓ 'ㅝ'
+                    ilist[ili] = 'ㅡ'
+                    tempidx.append(ili)
+                    tempval.append(d.fu_hina[4])
+                elif ilv in d.fu_4:#ㅡㅣ 'ㅟ', 'ㅢ'
+                    ilist[ili] = 'ㅡ'
+                    tempidx.append(ili)
+                    tempval.append(d.fu_hina[1])
+            if ilv in 'ㅘ' and ilist[ili-1] != 'ㅇ':
+                ilist[ili] = 'ㅗ'
+                tempidx.append(ili)
+                tempval.append(d.fu_hina[0])
+        if tempval:
+            ###print(tempidx)
+            ###print(tempval)
+            t = 1
+            for i,v in enumerate(tempidx):
+                ilist.insert(v+t,tempval[i])
+                t += 1
+        return ilist
+        pass
 
     def ssang(self,tempidx, ):
         
@@ -240,10 +287,6 @@ class Translation:
             zzinput[-1] = '笑'
         ###print('zzoutput', zzinput)
         return zzinput
-
-    # 이음동의어 ex) ㅊ ㅉ 씨=시=쉬 ㅓ=ㅗ ㅡ=ㅜ 이딴거 받침 제외하고 처리해야 될 듯
-    def sam(self):
-        pass
 
     # 특문 이건 근데 굳이 필요한가 싶음
     def sym(self):
@@ -318,3 +361,5 @@ if __name__ == "__main__":
     #is_not_test = False # 배포시 비활성화
 
     main_process()
+
+    # 왤케코드가 길어?
