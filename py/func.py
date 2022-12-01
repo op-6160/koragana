@@ -4,10 +4,10 @@ import data as d
 
 is_not_test = True
 
-
+exitcode = ['e', 'ㄷ', 'e ', ' e', 'ㄷ ', ' ㄷ']
 def get_item():
     get_string = input("input:")
-    if get_string == 'e' or get_string == 'ㄷ' or get_string == ' e' or get_string == ' ㄷ':
+    if get_string in exitcode:
         exit()
     ###print(get_string) #input 검증
     return get_string
@@ -29,19 +29,8 @@ def rs(reversesort):
 
 class Translation:
     def __init__(self, input_string):
-        # dataload
         self.val = input_string
         #self.cnt = 0
-        self.kor = d.kor
-        self.jap = d.jap
-        self.jak = d.jak
-        self.ja = d.jaeum
-        self.ja_ex = d.jaeum_ex
-        self.mo = d.moeum
-        self.yo = d.jap_yo
-        self.yk = d.jap_yk
-        self.wow1 = d.wow1
-        self.wow2 = d.wow2
 
         self.x = self.anl(self.val)
         #print('end anl',self.x)
@@ -59,8 +48,8 @@ class Translation:
     # 요음(ㅑㅠㅛ) 처리
     def dis(self, dis_input):
         dis_list_ = distjamo(dis_input)
-        ja_list = self.ja
-        yo_list = self.yo
+        ja_list = d.jaeum
+        yo_list = d.jap_yo
         for j_idx, j_val in enumerate(dis_list_):
             for ja_idx, ja_val in enumerate(ja_list):
                 if ja_val == j_val:
@@ -78,8 +67,8 @@ class Translation:
     # 받침 처리
     def syll(self, syll_input):
         syll_list = distjamo(syll_input)
-        mo_list = self.mo
-        ja_list = self.ja_ex
+        mo_list = d.moeum
+        ja_list = d.jaeum_ex
         batchim = d.batchim_h # if () else d.batchim_g
         spe_syll_list = list(d.is_im_sads)
         temp_idx_list=[]
@@ -169,16 +158,16 @@ class Translation:
         tempidx = []
         for lidx, lval in enumerate(ilist):
             if lval in d.sajs :#and lidx < int(len(ilist))-1:
-                if lidx == int(len(ilist))-1 or ilist[lidx+1] in self.mo:
+                if lidx == int(len(ilist))-1 or ilist[lidx+1] in d.moeum:
                     if   lval in d.saj_1: ilist[lidx] = 'ㅅ'
                     elif lval in d.saj_2: ilist[lidx] = 'ㅍ'
                     elif lval in d.saj_3: ilist[lidx] = 'ㅊ'
                     elif lval in d.saj_4: ilist[lidx] = 'ㅋ'
                 # 쌍받침 처리 일단 쌍시옷만
                 # 뒤 자음이 ㅇ인 받침 ㅆ은 종성ㅅ이랑 초성ㅅ으로 분리 근데 개복잡하네 진짜
-                if lidx != int(len(ilist)) - 1 and lval == d.saj_1 and ilist[lidx-1] in self.mo and ilist[lidx+1] == 'ㅇ':
+                if lidx != int(len(ilist)) - 1 and lval == d.saj_1 and ilist[lidx-1] in d.moeum and ilist[lidx+1] == 'ㅇ':
                     tempidx.append(lidx)
-                if ilist[lidx-1] in self.mo and lval == d.saj_1:
+                if ilist[lidx-1] in d.moeum and lval == d.saj_1:
                     ilist[lidx] = 'ㅅ'
             elif lidx == int(len(ilist))-1:
                 if   lval in d.saj_1: ilist[lidx] = 'ㅅ'
@@ -252,8 +241,8 @@ class Translation:
         #self.cnt_list = list(range(len(i))) # 특별문자 처리(def specaial)를 위한 index list
         #self.cnt_list.remove(int(len(self.cnt_list))-1) # 마지막 공백 index 제거
         i = list(trans_input)
-        cnt = self.kor
-        jap = self.jap
+        cnt = d.kor
+        jap = d.jap
         ###print('transinput', i)  #
         for a_idx, a_val in enumerate(i):
             hiragana = 0
@@ -275,8 +264,8 @@ class Translation:
     # ㅋㅋ 처리
     def zz(self,zzinput):
         ###print('zzinput',zzinput)
-        wow1 = self.wow1
-        wow2 = self.wow2
+        wow1 = d.wow1
+        wow2 = d.wow2
         for idx, val in enumerate(zzinput):
             if val in wow1:
                 for wowidx, wowval in enumerate(wow1):
