@@ -21,7 +21,7 @@ def distjamo(dist_list):
 
 
 def joinjamo(join_list):
-    print("joinjamo joinlist",join_list)
+    print("joinjamo joinlist", join_list)
     joined = list(join_jamos(join_list))
     return joined
 
@@ -36,17 +36,19 @@ class Translation:
         #self.cnt = 0
 
         self.x = self.anl(self.val)
-        #print('end anl',self.x)
+        print('end anl', self.x)
         self.x = self.anl_3(self.x)
-        #self.x = self.zz(self.x)
-        #print('end zz', self.x)
-        self.x = self.trans(self.x)
+        print('end anl_3', self.x)
         self.x = self.zz(self.x)
-        #print('end trans', self.x)
+        print('end zz_1', self.x)
+        self.x = self.trans(self.x)
+        print('end trans', self.x)
+        self.x = self.zz(self.x)
+        print('end zz_2', self.x)
         self.x = self.special(self.x)
-        #print('end special', self.x)
+        print('end special', self.x)
         self.x = self.join(self.x)
-        #print('end class', self.x)
+        print('end class', self.x)
 
     # 요음(ㅑㅠㅛ) 처리
     def dis(self, dis_input):
@@ -78,43 +80,42 @@ class Translation:
             print("before process", syll_list)
             syll_list, temp_idx_list, temp_syll_list = self.spesyll(syll_list)
             print("process done")
-            print("after process",syll_list)
+            print("after process", syll_list)
         if temp_syll_list:
             #temp_idx_list = np.concatenate(temp_idx_list).tolist()
             #temp_syll_list = np.concatenate(temp_syll_list).tolist()
-            print("temp_idx_list",temp_idx_list)
-            print("temp_syll_list",temp_syll_list)
+            print("temp_idx_list", temp_idx_list)
+            print("temp_syll_list", temp_syll_list)
 
             if len(temp_idx_list) == 1:
-                print("before insert",syll_list)
                 syll_list.insert(temp_idx_list[0], temp_syll_list[0])
-                print("after insert", syll_list)
             elif len(temp_idx_list) > 1:
                 cnt = 1
-                print("before insert", syll_list)
                 for i, v in enumerate(temp_idx_list):
                     syll_list.insert(int(v + cnt), temp_syll_list[i])
                     cnt += 1
-                print("after insert", syll_list)
         syll_list, is_have_spes = self.nor_syll(syll_list)
         ###print('sy_val2', sy_val)
         ###print('syll_list_out', syll_list)
-        print("def syll done",syll_list)
         return syll_list
 
     #평범한 받침 처리
-    def nor_syll(self,in_syll):
+    def nor_syll(self, in_syll):
         is_have_spes = False
         mo_list = d.moeum
-        ja_list = d.jaeum_ex
+        #ja_list = d.jaeum_ex
         syll_list = in_syll
         spe_syll_list = list(d.is_im_sads)
         batchim = d.batchim_h  # if () else d.batchim_g
         for sy_idx, sy_val in enumerate(syll_list):
             ###print('sy_val1',sy_val)
             ###print('syll_list[sy_idx-2]',syll_list[sy_idx-2],sy_idx)
-            if sy_idx<int(len(syll_list)-1) and syll_list[sy_idx - 1] in mo_list and sy_idx != 0 and syll_list[sy_idx+1]not in mo_list\
-                    or sy_idx == int(len(syll_list)-1) and syll_list[sy_idx - 1] in mo_list:
+            if sy_idx<int(len(syll_list)-1) \
+                    and syll_list[sy_idx - 1] in mo_list \
+                    and sy_idx != 0 \
+                    and syll_list[sy_idx+1]not in mo_list \
+                    or sy_idx == int(len(syll_list) - 1) \
+                    and syll_list[sy_idx - 1] in mo_list:
                 if sy_val in d.baatn:
                     syll_list[sy_idx] = batchim[0] # ん
                 elif sy_val in d.baats:
@@ -123,7 +124,7 @@ class Translation:
                     syll_list[sy_idx] = batchim[2] # む
                 elif sy_val in 'ㄹ':
                     syll_list[sy_idx] = batchim[3] # る
-                elif sy_val in spe_syll_list and is_have_spes == False:
+                elif sy_val in spe_syll_list and not is_have_spes:
                     is_have_spes = True
         return syll_list, is_have_spes
 
@@ -132,123 +133,92 @@ class Translation:
         print("spsin", spsin)
         tidx_list = []
         tval_list = []
-        cnt = 0
+        #cnt = 0
         for tidx, tval in enumerate(spsin):
             if tidx < int(len(spsin))-1 and tval in d.im_sad1:
                 if tval == 'ㄵ':
                     spsin[tidx] = 'ㄴ'
                     tval = 'ㅈ'
-                    if spsin[tidx+1] in d.no_ja:
-                        print('호우')
-                        spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
-                        print('호우앤두',spsin, ti, tv)
-                        if len(ti) > 0:
-                            for tii, tiv in enumerate(ti):
-                                tval_list.append(tv[tii])
-                                tidx_list.append(tiv)
-                            #tval_list.append(tv)
-                            #tidx_list.append(ti)
-                    else:
-                        tval_list.append('ㅈ')
-                        tidx_list.append(tidx)
                 elif tval == 'ㄶ':
-                    print('tval=ㄶ')
                     spsin[tidx] = 'ㄴ'
                     tval = 'ㅎ'
-                    if spsin[tidx + 1] in d.no_ja:
-                        print('1')
-                        spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
-                        print('case 1',spsin, ti, tv)
-                        if ti:
-                            print('case 1 and ㅘ ㅕ ㅛ ㅠ 이딴거')
-                            for tii, tiv in enumerate(ti):
-                                tval_list.append(tv[tii])
-                                tidx_list.append(tiv)
-                    else:
-                        print('2')
-                        tval_list.append('ㅎ')
-                        tidx_list.append(tidx)
+                if spsin[tidx + 1] in d.no_ja:
+                    spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
+                    if ti:
+                        for tii, tiv in enumerate(ti):
+                            tval_list.append(tv[tii])
+                            tidx_list.append(tiv)
+                else:
+                    tval_list.append('ㅈ') if tval == 'ㄵ' else tval_list.append('ㅎ')
+                    tidx_list.append(tidx)
             elif tval in d.im_sad2:
                 if tval == 'ㄳ':
                     spsin[tidx] = 'ㄱ'
-                    tval = 'ㅅ'
-                    if spsin[tidx+1] in d.no_ja:
-                        spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
-                        if ti:
-                            for tii, tiv in enumerate(ti):
-                                tval_list.append(tv[tii])
-                                tidx_list.append(tiv)
-                    else:
-                        tval_list.append('ㅅ')
-                        tidx_list.append(tidx)
-                if tval == 'ㅄ':
+                elif tval == 'ㅄ':
                     spsin[tidx] = 'ㅂ'
-                    tval = 'ㅅ'
-                    if spsin[tidx +1] in d.no_ja:
-                        spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
-                        if ti:
-                            for tii, tiv in enumerate(ti):
-                                tval_list.append(tv[tii])
-                                tidx_list.append(tiv)
-                    else:
-                        tval_list.append('ㅅ')
-                        tidx_list.append(tidx)
-        print("after tidx_list",tidx_list)
-        print("after tval_list", tval_list)
+                tval = 'ㅅ'
+                if spsin[tidx +1] in d.no_ja:
+                    spsin, ti, tv = self.fj_is_o(spsin, tval, tidx)
+                    if ti:
+                        for tii, tiv in enumerate(ti):
+                            tval_list.append(tv[tii])
+                            tidx_list.append(tiv)
+                else:
+                    tval_list.append('ㅅ')
+                    tidx_list.append(tidx)
         return spsin, tidx_list, tval_list
 
     # 쌍받침 자음 옮기기
-    def fj_is_o(self, spsin, in_ja, in_dex): # 들어올 in_ja = 'ㅈ' or 'ㅎ' or 'ㅅ'
-        print('fj_is_o spsin, in_ja', spsin, in_ja, in_dex)
+    # 이거 어떻게 좀 줄이고싶네
+    def fj_is_o(self, spsin, in_ja, in_dex):  # 들어올 in_ja = 'ㅈ' or 'ㅎ' or 'ㅅ'
         tempidx = []
         tempval = []
         i = in_dex + 1
-        v = spsin[i]
+        #v = spsin[i]
         if spsin[i] == 'あ':
-            if in_ja in 'ㅅ' : spsin[i] = 'さ'
-            elif in_ja in 'ㅈ' : spsin[i] = 'ざ'
+            if in_ja in 'ㅅ': spsin[i] = 'さ'
+            elif in_ja in 'ㅈ': spsin[i] = 'ざ'
             else: spsin[i] = 'は'
         elif spsin[i] == 'い':
-            if in_ja in 'ㅅ' : spsin[i] = 'し'
-            elif in_ja in 'ㅈ' : spsin[i] = 'じ'
+            if in_ja in 'ㅅ': spsin[i] = 'し'
+            elif in_ja in 'ㅈ': spsin[i] = 'じ'
             else: spsin[i] = 'ひ'
         elif spsin[i] == 'う':
-            if in_ja in 'ㅅ' : spsin[i] = 'す'
-            elif in_ja in 'ㅈ' : spsin[i] = 'ず'
+            if in_ja in 'ㅅ': spsin[i] = 'す'
+            elif in_ja in 'ㅈ': spsin[i] = 'ず'
             else: spsin[i] = 'ふ'
         elif spsin[i] == 'え':
-            if in_ja in 'ㅅ' : spsin[i] = 'せ'
-            elif in_ja in 'ㅈ' : spsin[i] = 'ぜ'
+            if in_ja in 'ㅅ': spsin[i] = 'せ'
+            elif in_ja in 'ㅈ': spsin[i] = 'ぜ'
             else: spsin[i] = 'へ'
         elif spsin[i] == 'お':
-            if in_ja in 'ㅅ' : spsin[i] = 'そ'
-            elif in_ja in 'ㅈ' : spsin[i] = 'ぞ'
+            if in_ja in 'ㅅ': spsin[i] = 'そ'
+            elif in_ja in 'ㅈ': spsin[i] = 'ぞ'
             else: spsin[i] = 'ほ'
         elif spsin[i] == 'わ':
-            if in_ja in 'ㅅ' : spsin[i] = 'す'
-            elif in_ja in 'ㅈ' : spsin[i] = 'ず'
+            if in_ja in 'ㅅ': spsin[i] = 'す'
+            elif in_ja in 'ㅈ': spsin[i] = 'ず'
             else: spsin[i] = 'ふ'
             tempval.append('あ')
             tempidx.append(i+1)
         elif spsin[i] == 'や':
-            if in_ja in 'ㅅ' : spsin[i] = 'し'
-            elif in_ja in 'ㅈ' : spsin[i] = 'じ'
+            if in_ja in 'ㅅ': spsin[i] = 'し'
+            elif in_ja in 'ㅈ': spsin[i] = 'じ'
             else: spsin[i] = 'ひ'
             tempval.append('や')
             tempidx.append(i + 1)
         elif spsin[i] == 'ゆ':
-            if in_ja in 'ㅅ' : spsin[i] = 'し'
-            elif in_ja in 'ㅈ' : spsin[i] = 'じ'
+            if in_ja in 'ㅅ': spsin[i] = 'し'
+            elif in_ja in 'ㅈ': spsin[i] = 'じ'
             else: spsin[i] = 'ひ'
             tempval.append('ゆ')
             tempidx.append(i + 1)
         elif spsin[i] == 'よ':
-            if in_ja in 'ㅅ' : spsin[i] = 'し'
-            elif in_ja in 'ㅈ' : spsin[i] = 'じ'
+            if in_ja in 'ㅅ': spsin[i] = 'し'
+            elif in_ja in 'ㅈ': spsin[i] = 'じ'
             else: spsin[i] = 'ひ'
             tempval.append('よ')
             tempidx.append(i + 1)
-        print("fjiso return",spsin, tempidx, tempval)
         return spsin, tempidx, tempval
 
     # 특수문자(요음,받침) 처리
@@ -257,21 +227,23 @@ class Translation:
         #print('special value',value)
         #value = np.concatenate(value).tolist()
 
-        print('before joinjamo',value)
         value = joinjamo(value)
-        print('after joinjamo', value)
-
-        ###print('join_jamos',value)
+        print("--------special--------")
         value = self.anl(value)
+        print('end anl in special', value)
         value = self.anl_3(value)
+        print('end anl_3 in special', value)
         value = self.trans(value)
+        print('end trans in special', value)
         value = self.dis(value)
+        print('end dis in special', value)
+        print("--------special--------")
         ###print('return special', value)
         return value
         pass
 
     # 전처리
-    def anl(self,anl_input):
+    def anl(self, anl_input):
         string = anl_input
         ###print('anlinput', string) ##
         out = list(string)
@@ -304,9 +276,14 @@ class Translation:
         ilist = self.sam(ilist)
         tempidx = []
         for lidx, lval in enumerate(ilist):
-            if lval in d.sajs :#and lidx < int(len(ilist))-1:
+            if lval in d.sajs:#and lidx < int(len(ilist))-1:
                 if lidx == int(len(ilist))-1 or ilist[lidx+1] in d.moeum:
-                    if   lval in d.saj_1: ilist[lidx] = 'ㅅ'
+                    if lval in d.saj_1: #ilist[lidx] = 'ㅅ'
+                        #print("active d.saj1")
+                        ilist[lidx] = 'ㅅ'
+                        if ilist[lidx + 1] == 'ㅇ':
+                            ilist[lidx+1] = 'ㅅ'
+                            #았아가 앗수아가 되는데 --------
                     elif lval in d.saj_2: ilist[lidx] = 'ㅍ'
                     elif lval in d.saj_3: ilist[lidx] = 'ㅊ'
                     elif lval in d.saj_4: ilist[lidx] = 'ㅋ'
@@ -328,9 +305,9 @@ class Translation:
             for idd, iv in enumerate(tempidx):
                 ilist[iv] = 'ㅅ'
                 tempidx[idd] += 1
-        if tempidx :
+        if tempidx:
             for idd in tempidx:
-                ilist.insert(idd,'ㅅ')
+                ilist.insert(idd, 'ㅅ')
         #ilist = self.sam(ilist)
         out_anl_3 = joinjamo(ilist)
         return out_anl_3
@@ -403,7 +380,7 @@ class Translation:
         ###print('trans end',i)
         return i
 
-    def join(self,x):
+    def join(self, x):
         output = ''.join(x)
         ###print('joinend',output)
         return output
