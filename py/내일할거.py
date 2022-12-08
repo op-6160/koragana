@@ -1,10 +1,15 @@
 '''
-ㄺ ㄽ ㄾ 이딴거 해야됨 <<<<<<<
+1. oofunc.py ,oodata.py ,로 갈아탔으니까 기억하기
+
+2. 아이우에오 카키쿠케코 하면 될거같은데 ㅑㅠㅛ 먼저 처리하게 하고 나서 나머지 하게금 해야될거같음
+
+3. 브랜치 잘못만들어서 자꾸 push할때 풀네임 쳐야되는데 이거 수정하기 진짜 개귀찮음 항상 하던대로 할걸 괜히 이상한짓 해가지고
+
 
 # git fetch 브랜치주소
 # git branch --set-upstream-to origin/ing 브랜치 연결
 # git remote rm origin
-#git remote show origin
+# git remote show origin
 # git branch -r
 # git branch -a
 
